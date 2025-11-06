@@ -15,7 +15,6 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
   const bottomSheetRef = useRef<BottomSheetModal>(null)
   const screenHeight = Dimensions.get('window').height
   const insets = useSafeAreaInsets()
-  const [contentHeight, setContentHeight] = useState(screenHeight)
   const buttonAnimation = useRef(new Animated.Value(0)).current
   const { colorScheme } = useColorScheme()
 
@@ -68,33 +67,16 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
         return
       }
 
-      const currentSnapPoint = snapPoints[index]
-      let newHeight: number
-
-      if (typeof currentSnapPoint === 'string') {
-        if (currentSnapPoint.endsWith('%')) {
-          const percentage = parseInt(currentSnapPoint, 10)
-          newHeight = (screenHeight * percentage) / 100
-        } else if (isDetached) {
-          // For detached mode, we'll let the content determine the height
-          return
-        } else {
-          newHeight = parseInt(currentSnapPoint, 10)
-        }
-      } else {
-        newHeight = currentSnapPoint
+      // Animate button based on snap point index
+      if (!isDetached && snapPoints.length > 0) {
+        const maxIndex = Math.max(snapPoints.length - 1, 1)
+        Animated.spring(buttonAnimation, {
+          toValue: index / maxIndex,
+          useNativeDriver: true,
+        }).start()
       }
-
-      setContentHeight(newHeight)
-
-      // Animate button
-      const maxIndex = Math.max(snapPoints.length - 1, 1)
-      Animated.spring(buttonAnimation, {
-        toValue: index / maxIndex,
-        useNativeDriver: true,
-      }).start()
     },
-    [setShowModal, buttonAnimation, snapPoints, screenHeight, isDetached],
+    [setShowModal, buttonAnimation, snapPoints, isDetached],
   )
 
   const buttonTranslateY = buttonAnimation.interpolate({
@@ -197,10 +179,7 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
         <RenderedSheet
           isDetached={isDetached}
           checkedProps={checkedProps}
-          height={contentHeight}
           btnTranslateY={buttonTranslateY}
-          maxHeight={maxSheetHeight}
-          enableMaxHeightConstraint={enableMaxHeightConstraint}
         />
       }
     </BottomSheetModal>

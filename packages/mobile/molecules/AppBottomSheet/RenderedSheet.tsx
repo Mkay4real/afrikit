@@ -27,17 +27,11 @@ const renderContent = (
 function RenderedSheet({
   isDetached,
   checkedProps,
-  height,
   btnTranslateY,
-  maxHeight,
-  enableMaxHeightConstraint = true,
 }: {
   isDetached: boolean
   checkedProps: DetachedProps | RegularProps
-  height: number
   btnTranslateY: Animated.AnimatedInterpolation<number | string>
-  maxHeight: number
-  enableMaxHeightConstraint?: boolean
 }) {
   if (isDetached) {
     const { title, icon, content, titleProps, subtitleProps, secondaryActionButton, actionButton } =
@@ -106,12 +100,8 @@ function RenderedSheet({
     const { title, children, actionButton, fixedHeader, contentContainerStyle } =
       checkedProps as RegularProps
 
-    // Constrain the height to not exceed maxHeight (only if enabled)
-    const constrainedHeight = enableMaxHeightConstraint ? Math.min(height, maxHeight) : height
-    const styleMaxHeight = enableMaxHeightConstraint ? maxHeight : undefined
-
     return (
-      <BottomSheetView style={{ height: constrainedHeight, maxHeight: styleMaxHeight }}>
+      <BottomSheetView>
         <View className="w-full px-md">
           {/* Title Section */}
           {title && (

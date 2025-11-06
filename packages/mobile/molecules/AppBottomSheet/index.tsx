@@ -130,7 +130,7 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
       }
       enablePanDownToClose={enableMaxHeightConstraint ? true : !isDetached} // New behavior or backward compatible
       backdropComponent={renderBackdrop}
-      enableDynamicSizing={isDetached}
+      enableDynamicSizing={true} // Enable dynamic sizing for both detached and regular modes
       maxDynamicContentSize={enableMaxHeightConstraint ? maxSheetHeight : undefined} // Constrain dynamic sizing only if enabled
       android_keyboardInputMode="adjustResize"
       keyboardBehavior="extend"

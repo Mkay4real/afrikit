@@ -3,7 +3,8 @@ import { BottomSheetDefaultBackdropProps } from '@gorhom/bottom-sheet/lib/typesc
 import colors from 'afrikit-shared/dist/colors'
 import { useColorScheme } from 'nativewind'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Animated, Dimensions } from 'react-native'
+import { Animated, Dimensions, Platform, StatusBar } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { AppBottomSheetProps } from '../../types/molecules'
 import checkBottomSheetProps from './checkBottomSheetProps'
 import RenderedSheet from './RenderedSheet'
@@ -13,20 +14,44 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
   // ref
   const bottomSheetRef = useRef<BottomSheetModal>(null)
   const screenHeight = Dimensions.get('window').height
+  const insets = useSafeAreaInsets()
   const [contentHeight, setContentHeight] = useState(screenHeight)
   const buttonAnimation = useRef(new Animated.Value(0)).current
   const { colorScheme } = useColorScheme()
 
   const { isDetached, showModal, setShowModal, backdropClose, height } = checkedProps
 
+  // Calculate max height to avoid overlap with top bar
+  // Account for status bar and safe area insets
+  const statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0
+  const maxSheetHeight = screenHeight - insets.top - statusBarHeight - 60 // 60px margin from top
+
   // variables
   const snapPoints = useMemo(() => {
     if (isDetached) {
-      return [height ?? 300] // Use provided height or default to 300
+      // Ensure detached height doesn't exceed max height
+      const detachedHeight = height ?? 300
+      return [Math.min(detachedHeight, maxSheetHeight)]
     }
-    const defaultSnapPoints = ['10%', '25%', '35%', '50%', '70%', '95%']
-    return 'height' in checkedProps && height ? [height, ...defaultSnapPoints] : defaultSnapPoints
-  }, [isDetached, checkedProps, height])
+
+    // For regular mode, calculate snap points respecting max height
+    const calculateSnapPoint = (percentage: string): number => {
+      const value = parseInt(percentage, 10)
+      const calculatedHeight = (screenHeight * value) / 100
+      return Math.min(calculatedHeight, maxSheetHeight)
+    }
+
+    const percentageSnapPoints = ['25%', '35%', '50%', '70%', '90%']
+    const calculatedSnapPoints = percentageSnapPoints.map(calculateSnapPoint)
+
+    if ('height' in checkedProps && height) {
+      // If custom height is provided, ensure it respects max height
+      const constrainedHeight = Math.min(height, maxSheetHeight)
+      return [constrainedHeight, ...calculatedSnapPoints]
+    }
+
+    return calculatedSnapPoints
+  }, [isDetached, checkedProps, height, maxSheetHeight, screenHeight])
 
   const handleSheetChanges = useCallback(
     (index: number) => {
@@ -113,12 +138,23 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
       enableHandlePanningGesture={
         !isDetached && ('isSwipeable' in checkedProps ? checkedProps.isSwipeable : true)
       }
-      enablePanDownToClose={!isDetached}
+      enablePanDownToClose={true} // Enable for both detached and regular modes
       backdropComponent={renderBackdrop}
       enableDynamicSizing={isDetached}
+      maxDynamicContentSize={maxSheetHeight} // Constrain dynamic sizing
       android_keyboardInputMode="adjustResize"
       keyboardBehavior="extend"
       keyboardBlurBehavior="restore"
+      // Improve Android dismissal behavior
+      animationConfigs={{
+        overshootClamping: true,
+        stiffness: 250,
+        damping: 30,
+        mass: 0.5,
+      }}
+      // Better gesture handling for Android
+      activeOffsetY={[-10, 10]}
+      failOffsetX={[-10, 10]}
       backgroundStyle={[
         {
           backgroundColor:
@@ -154,6 +190,7 @@ const AppBottomSheet = <T extends boolean>(props: AppBottomSheetProps<T>) => {
           checkedProps={checkedProps}
           height={contentHeight}
           btnTranslateY={buttonTranslateY}
+          maxHeight={maxSheetHeight}
         />
       }
     </BottomSheetModal>

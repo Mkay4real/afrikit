@@ -641,3 +641,193 @@ export const DetachedWithComplexContent: Story = {
     },
   },
 }
+
+// Stories to test new dynamic resize and dismissal improvements
+
+export const MaxHeightConstraintTest: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: false,
+    backdropClose: true,
+    index: 4, // 90% snap point
+    title: {
+      text: 'Max Height Test',
+      align: 'center',
+      subtitle: 'This sheet should never overlap with the top bar',
+    },
+    isSwipeable: true,
+    children: (
+      <View style={styles.gap16}>
+        <AppText className="text-center text-sm-body text-light-type-gray-muted dark:text-dark-type-gray-muted">
+          Try resizing to the largest snap point. The sheet should never overlap with the status
+          bar or safe area.
+        </AppText>
+        {Array.from({ length: 30 }).map((_, index) => (
+          <AppListItem
+            key={index}
+            title={`List Item ${index + 1}`}
+            subtitle="This is test content to create a very tall list"
+            variant="2-line"
+            leading="icon"
+            leadingIcon="file-list-3-line"
+            trailing="icon"
+            trailingIcon="arrow-right-s-line"
+            separator={index !== 29}
+          />
+        ))}
+      </View>
+    ),
+  },
+}
+
+export const DetachedExceedsMaxHeight: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: true,
+    backdropClose: true,
+    height: 2000, // Intentionally set to a very large value
+    title: 'Detached Max Height Test',
+    content:
+      'This detached sheet has height set to 2000px, but it should be constrained to not overlap with the top bar. Try dismissing by swiping down.',
+    icon: <Icon name="ruler-line" size="76" color="#3B82F6" />,
+    actionButton: {
+      text: 'Test Dismiss',
+      action: () => {},
+      color: 'accent',
+      variant: 'solid',
+    },
+  },
+}
+
+export const AndroidDismissalTest: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: true,
+    backdropClose: true,
+    height: 400,
+    title: 'Android Dismissal Test',
+    content:
+      'Test the improved dismissal behavior on Android. Swipe down to dismiss - it should feel smooth and responsive, similar to iOS.',
+    icon: <Icon name="android-line" size="76" color="#3DDC84" />,
+    actionButton: {
+      text: 'Keep Open',
+      action: () => {},
+      color: 'success',
+      variant: 'soft',
+    },
+    secondaryActionButton: {
+      text: 'Dismiss',
+      action: () => {},
+      color: 'neutral',
+      variant: 'soft',
+    },
+  },
+}
+
+export const DynamicContentResize: Story = {
+  render: () => {
+    const [showModal, setShowModal] = useState(false)
+    const [itemCount, setItemCount] = useState(3)
+
+    return (
+      <GestureHandlerRootView className={'flex-1'}>
+        <BottomSheetModalProvider>
+          <View className={'flex-1 items-center justify-center gap-y-md'}>
+            <AppButton
+              size={4}
+              text={'Open Bottom Sheet'}
+              color={'neutral'}
+              variant={'solid'}
+              highContrast
+              onPress={() => setShowModal(true)}
+            />
+            <AppBottomSheet
+              isDetached={false}
+              showModal={showModal}
+              setShowModal={setShowModal}
+              backdropClose
+              index={2}
+              title={{
+                text: 'Dynamic Content Test',
+                align: 'center',
+                subtitle: 'Add/remove items to see dynamic resizing',
+              }}
+              isSwipeable={true}
+              fixedHeader={
+                <View style={[styles.flexRow, styles.gap8, { marginBottom: 16 }]}>
+                  <AppButton
+                    size={3}
+                    text="Add Item"
+                    color="success"
+                    variant="soft"
+                    iconStart="add-line"
+                    onPress={() => setItemCount(prev => Math.min(prev + 3, 20))}
+                  />
+                  <AppButton
+                    size={3}
+                    text="Remove Item"
+                    color="error"
+                    variant="soft"
+                    iconStart="subtract-line"
+                    onPress={() => setItemCount(prev => Math.max(prev - 3, 1))}
+                  />
+                </View>
+              }>
+              <View style={styles.gap16}>
+                {Array.from({ length: itemCount }).map((_, index) => (
+                  <AppListItem
+                    key={index}
+                    title={`Dynamic Item ${index + 1}`}
+                    subtitle="Content adjusts automatically"
+                    variant="2-line"
+                    leading="icon"
+                    leadingIcon="file-line"
+                    separator={index !== itemCount - 1}
+                  />
+                ))}
+              </View>
+            </AppBottomSheet>
+          </View>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    )
+  },
+}
+
+export const CustomHeightWithConstraint: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: false,
+    backdropClose: true,
+    height: 1500, // Very large custom height
+    title: {
+      text: 'Custom Height with Max Constraint',
+      align: 'center',
+      subtitle: 'Height set to 1500px but constrained by maxHeight',
+    },
+    isSwipeable: true,
+    children: (
+      <View style={styles.gap16}>
+        <AppText className="text-center text-sm-body text-light-type-gray-muted dark:text-dark-type-gray-muted">
+          This sheet has a custom height of 1500px, but it should be constrained to not exceed the
+          safe max height.
+        </AppText>
+        {Array.from({ length: 20 }).map((_, index) => (
+          <AppListItem
+            key={index}
+            title={`Item ${index + 1}`}
+            subtitle="Testing custom height constraint"
+            variant="2-line"
+            leading="icon"
+            leadingIcon="list-check"
+            separator={index !== 19}
+          />
+        ))}
+      </View>
+    ),
+    actionButton: {
+      text: 'Close',
+      action: () => {},
+    },
+  },
+}

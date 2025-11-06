@@ -712,7 +712,7 @@ export const AndroidDismissalTest: Story = {
     actionButton: {
       text: 'Keep Open',
       action: () => {},
-      color: 'success',
+      color: 'accent',
       variant: 'soft',
     },
     secondaryActionButton: {
@@ -758,7 +758,7 @@ export const DynamicContentResize: Story = {
                   <AppButton
                     size={3}
                     text="Add Item"
-                    color="success"
+                    color="accent"
                     variant="soft"
                     iconStart="add-line"
                     onPress={() => setItemCount(prev => Math.min(prev + 3, 20))}
@@ -901,7 +901,7 @@ export const ComparisonNewVsOld: Story = {
             <AppButton
               size={4}
               text={'Open New Behavior (Constrained)'}
-              color={'success'}
+              color={'accent'}
               variant={'solid'}
               highContrast
               onPress={() => setShowModal1(true)}

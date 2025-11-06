@@ -28,6 +28,7 @@ export type CommonProps = {
   actionButton?: ActionButtonProps
   contentContainerStyle?: StyleProp<ViewStyle>
   backgroundStyle?: StyleProp<Omit<ViewStyle, 'position' | 'top' | 'left' | 'bottom' | 'right'>>
+  enableMaxHeightConstraint?: boolean // Enable dynamic max height constraint (default: true)
 }
 
 export type AppBottomSheetProps<T extends boolean> = CommonProps & {

@@ -831,3 +831,155 @@ export const CustomHeightWithConstraint: Story = {
     },
   },
 }
+
+// Stories to test backward compatibility
+
+export const BackwardCompatibleBehavior: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: false,
+    backdropClose: true,
+    index: 5, // 95% snap point (old behavior)
+    enableMaxHeightConstraint: false, // Disable new constraints
+    title: {
+      text: 'Backward Compatible Mode',
+      align: 'center',
+      subtitle: 'Old behavior with enableMaxHeightConstraint={false}',
+    },
+    isSwipeable: true,
+    children: (
+      <View style={styles.gap16}>
+        <AppText className="text-center text-sm-body text-light-type-gray-muted dark:text-dark-type-gray-muted">
+          This sheet uses the old behavior with enableMaxHeightConstraint set to false. It may
+          overlap with the top bar at 95% snap point.
+        </AppText>
+        {Array.from({ length: 30 }).map((_, index) => (
+          <AppListItem
+            key={index}
+            title={`List Item ${index + 1}`}
+            subtitle="Old behavior - may overlap top bar"
+            variant="2-line"
+            leading="icon"
+            leadingIcon="file-list-line"
+            separator={index !== 29}
+          />
+        ))}
+      </View>
+    ),
+  },
+}
+
+export const DetachedBackwardCompatible: Story = {
+  render: args => <BottomSheetWrapper {...args} />,
+  args: {
+    isDetached: true,
+    backdropClose: true,
+    height: 2000, // Very large height
+    enableMaxHeightConstraint: false, // Disable new constraints
+    title: 'Detached - Old Behavior',
+    content:
+      'This detached sheet has enableMaxHeightConstraint={false}, so it uses the old behavior without pan-down-to-close on detached mode.',
+    icon: <Icon name="history-line" size="76" color="#94A3B8" />,
+    actionButton: {
+      text: 'Old Behavior',
+      action: () => {},
+      color: 'neutral',
+      variant: 'soft',
+    },
+  },
+}
+
+export const ComparisonNewVsOld: Story = {
+  render: () => {
+    const [showModal1, setShowModal1] = useState(false)
+    const [showModal2, setShowModal2] = useState(false)
+
+    return (
+      <GestureHandlerRootView className={'flex-1'}>
+        <BottomSheetModalProvider>
+          <View className={'flex-1 items-center justify-center gap-y-md'}>
+            <AppButton
+              size={4}
+              text={'Open New Behavior (Constrained)'}
+              color={'success'}
+              variant={'solid'}
+              highContrast
+              onPress={() => setShowModal1(true)}
+            />
+            <AppButton
+              size={4}
+              text={'Open Old Behavior (Unconstrained)'}
+              color={'neutral'}
+              variant={'outline'}
+              onPress={() => setShowModal2(true)}
+            />
+
+            {/* New behavior with constraints */}
+            <AppBottomSheet
+              isDetached={false}
+              showModal={showModal1}
+              setShowModal={setShowModal1}
+              backdropClose
+              index={4}
+              enableMaxHeightConstraint={true}
+              title={{
+                text: 'New Behavior ✨',
+                align: 'center',
+                subtitle: 'Max height constraint enabled',
+              }}
+              isSwipeable={true}>
+              <View style={styles.gap16}>
+                <AppText className="text-center text-sm-body text-green-600 dark:text-green-400">
+                  This sheet respects max height and won't overlap the top bar
+                </AppText>
+                {Array.from({ length: 20 }).map((_, index) => (
+                  <AppListItem
+                    key={index}
+                    title={`Item ${index + 1}`}
+                    subtitle="Constrained behavior"
+                    variant="2-line"
+                    leading="icon"
+                    leadingIcon="shield-check-line"
+                    separator={index !== 19}
+                  />
+                ))}
+              </View>
+            </AppBottomSheet>
+
+            {/* Old behavior without constraints */}
+            <AppBottomSheet
+              isDetached={false}
+              showModal={showModal2}
+              setShowModal={setShowModal2}
+              backdropClose
+              index={5}
+              enableMaxHeightConstraint={false}
+              title={{
+                text: 'Old Behavior 📜',
+                align: 'center',
+                subtitle: 'Legacy mode (no constraints)',
+              }}
+              isSwipeable={true}>
+              <View style={styles.gap16}>
+                <AppText className="text-center text-sm-body text-orange-600 dark:text-orange-400">
+                  This sheet uses old behavior and may overlap the top bar at 95%
+                </AppText>
+                {Array.from({ length: 20 }).map((_, index) => (
+                  <AppListItem
+                    key={index}
+                    title={`Item ${index + 1}`}
+                    subtitle="Legacy behavior"
+                    variant="2-line"
+                    leading="icon"
+                    leadingIcon="history-line"
+                    separator={index !== 19}
+                  />
+                ))}
+              </View>
+            </AppBottomSheet>
+          </View>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    )
+  },
+}

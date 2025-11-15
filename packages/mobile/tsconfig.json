@@ -3,15 +3,15 @@
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": [
       "nativewind/types"
     ],
     "jsx": "react-jsx",
-    "module": "CommonJS",
-    "target": "ES6",
+    "module": "ESNext",
+    "target": "ES2022",
     "lib": [
-      "ES2016",
+      "ES2022",
       "DOM"
     ],
     "declaration": true,

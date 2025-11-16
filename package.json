@@ -12,7 +12,9 @@
     ]
   },
   "private": "true",
-
+  "resolutions": {
+    "globals": "^16.5.0"
+  },
   "files": [
     "dist"
   ],

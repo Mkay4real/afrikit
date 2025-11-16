@@ -22,7 +22,7 @@ module.exports = {
         backgroundColor: "#ffffff",
       },
     },
-    plugins: ["expo-font"],
+    plugins: ["expo-font", "expo-dev-client"],
     web: {
       favicon: "./assets/favicon.png",
     },
@@ -34,9 +34,8 @@ module.exports = {
     },
     updates: {
       url: "https://u.expo.dev/bc56fb0d-8c4f-4512-9e32-f2a75d227cd1",
+      enabled: false, // Disable updates in development
     },
-    runtimeVersion: {
-      policy: "appVersion",
-    },
+    runtimeVersion: "1.0.0",
   },
 };

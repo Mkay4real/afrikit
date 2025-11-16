@@ -15,8 +15,10 @@ module.exports = {
     },
     ios: {
       supportsTablet: true,
+      bundleIdentifier: "com.afrinvest.afrikit.mobile",
     },
     android: {
+      package: "com.afrinvest.afrikit.mobile",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff",
